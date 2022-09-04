@@ -188,7 +188,7 @@ const ReadProduct = () => {
           <br />
           {hasModel?.length ?
             <div className="container-fluid text-white bg-primary text-center py-2">
-              <span>Link to model: <Link to={`/modelview/${id}`}>{`inroom.tech/modelview/${id}`}</Link></span>
+              <span>Link to model: <Link to={`${BASE_URL}/modelview/${id}`}>{`inroom.tech/modelview/${id}`}</Link></span>
               <QRCode url={`${BASE_URL}/modelview/${id}`} isImage={false} isButton={true}/>
             </div>
             : <></>
