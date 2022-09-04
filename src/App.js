@@ -9,7 +9,7 @@ import PersistLogin from './components/Layouts/PersistLogin';
 import Register from './features/auth/Register';
 import Login from './features/auth/Login';
 import LoginRedir from './features/auth/LoginRedir';
-import Client from '../../panel/src/components/client/Client';
+import Client from './components/client/Client';
 // Products CRUD
 import Products from './features/products/Products';
 import AddProduct from './features/products/AddProduct';
