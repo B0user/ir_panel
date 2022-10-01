@@ -35,23 +35,23 @@ const SearchBar = ({ products, setSearchResults }) => {
   )
 }
 
-const Filter = ({ products, setSearchResults }) => {
-  return (
-    <div className="input-group mb-4">
-      <input
-        type="search"
-        className="form-control rounded"
-        placeholder="Search"
-        aria-label="Search"
-        aria-describedby="search-addon"
-        onChange={handleSearchChange}
-      />
-      <button type="button" className="btn btn-outline-primary" onClick={handleSubmit}>
-        поиск
-      </button>
-    </div>
-  )
-}
+// const Filter = ({ products, setSearchResults }) => {
+//   return (
+//     <div className="input-group mb-4">
+//       <input
+//         type="search"
+//         className="form-control rounded"
+//         placeholder="Search"
+//         aria-label="Search"
+//         aria-describedby="search-addon"
+//         onChange={handleSearchChange}
+//       />
+//       <button type="button" className="btn btn-outline-primary" onClick={handleSubmit}>
+//         поиск
+//       </button>
+//     </div>
+//   )
+// }
 
 const ListProducts = ({ data, refetch }) => {
   const navigate = useNavigate();
