@@ -121,7 +121,7 @@ const ReadProduct = () => {
 
   return (
     success 
-    ? <Navigate to="/client/products" replace /> 
+    ? <Navigate to="/panel/products" replace /> 
     : <div> 
         <p
           ref={errRef}
@@ -201,7 +201,7 @@ const ReadProduct = () => {
         </form>
         <p>
           <span className="line">
-            <Link to="/client/products">Отмена</Link>
+            <Link to="/panel/products">Отмена</Link>
           </span>
         </p>
     </div>  

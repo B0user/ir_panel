@@ -74,7 +74,7 @@ const AddProduct = () => {
   return (
     <>
       {success 
-      ? navigate('/client/products', {replace: true }) 
+      ? navigate('/panel/products', {replace: true }) 
       : (
         <>
           <p
@@ -139,7 +139,7 @@ const AddProduct = () => {
           </form>
           <p>
             <span className="line">
-              <Link to="/client/products">Отмена</Link>
+              <Link to="/panel/products">Отмена</Link>
             </span>
           </p>
         </>
