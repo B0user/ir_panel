@@ -102,7 +102,7 @@ const ListProducts = ({ data, refetch }) => {
             {data.filter((prod) => prod.category === 'carpet').map((product, i) => (
               <div
                 key={i}
-                className="info d-flex justify-content-between align-items-center ms-3 mb-2"
+                className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom"
               >
                 <li>
                   {product?.name}
@@ -148,6 +148,7 @@ const ListProducts = ({ data, refetch }) => {
                 key={i}
                 className="info d-flex justify-content-between align-items-center ms-3 mb-2"
               >
+                <hr />
                 <li>
                   {product.name}
                 </li>
@@ -226,7 +227,7 @@ const ListProducts = ({ data, refetch }) => {
   )
 }
 
-const Products = () => {
+const Products = ({published}) => {
   const axiosPrivate = useAxiosPrivate();
   const [searchResults, setSearchResults] = useState();
   const { data:products, error, isLoading, isError, refetch } = useQuery(
@@ -242,11 +243,11 @@ const Products = () => {
 
   return (
     <div className="row">
-      <h1 className="text-center mb-4">Список товаров</h1>
+      <h1 className="text-center mb-4">{!published ? "[АРХИВ] " : ""}Список товаров</h1>
       <div className="wrapper ">
         <SearchBar products={products} setSearchResults={setSearchResults} />
         {/* <Filter products={products} setSearchResults={setSearchResults}  /> */}
-        <ListProducts data={searchResults} refetch={refetch} />
+        <ListProducts data={searchResults.filter((prod) => prod.active === published)} refetch={refetch} />
 
         <Link to="add">
           <button className="btn btn-cp bg-cp-nephritis rounded-pill w-100">Добавить новый товар</button>

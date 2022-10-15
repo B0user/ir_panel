@@ -34,7 +34,8 @@ function App() {
             <Route path="panel" element={<PanelLayout role={1101}/>}>
               <Route index element={<Client />}/>
               <Route path="products">
-                <Route index element={<Products />}/>
+                <Route index element={<Products published={true}/>}/>
+                <Route path="archieve" element={<Products published={false}/>}/>
                 <Route path="add" element={<AddProduct />}/>
                 <Route path=":id" element={<ReadProduct />}/>
               </Route>
