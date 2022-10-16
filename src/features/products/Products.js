@@ -53,7 +53,7 @@ const SearchBar = ({ products, setSearchResults }) => {
 //   )
 // }
 
-const ListProducts = ({ data, refetch }) => {
+const ListProducts = ({ data, refetch, active }) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
 
@@ -63,7 +63,8 @@ const ListProducts = ({ data, refetch }) => {
       return;
     }
     try {
-      await axiosPrivate.delete(`/products/${id}`);
+      if(active) await axiosPrivate.delete(`/products/${id}`);
+      else await axiosPrivate.post(`/products/${id}/restore`);
       refetch();
     } catch (err) {
       console.error(err);
@@ -247,7 +248,7 @@ const Products = ({published}) => {
       <div className="wrapper ">
         <SearchBar products={products} setSearchResults={setSearchResults} />
         {/* <Filter products={products} setSearchResults={setSearchResults}  /> */}
-        <ListProducts data={searchResults.filter((prod) => prod.active === published)} refetch={refetch} />
+        <ListProducts data={searchResults.filter((prod) => prod.active === published)} refetch={refetch} active={published}/>
 
         <Link to="add">
           <button className="btn btn-cp bg-cp-nephritis rounded-pill w-100">Добавить новый товар</button>

@@ -51,7 +51,6 @@ const AddProduct = () => {
           name: name,
           description: description,
           price: price,
-          thumb_id: result.data.file_id, 
           thumb_path: result.data.path 
         })
       );
