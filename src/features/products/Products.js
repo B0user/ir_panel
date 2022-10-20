@@ -100,7 +100,7 @@ const ListProducts = ({ data, refetch, active }) => {
             id="carpets"
             data-bs-parent="#cats"
           >
-            {data.filter((prod) => prod.category === 'carpet').map((product, i) => (
+            {data.reverse().filter((prod) => prod.category === 'carpet')?.map((product, i) => (
               <div
                 key={i}
                 className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom"
@@ -144,7 +144,7 @@ const ListProducts = ({ data, refetch, active }) => {
             id="sofas"
             data-bs-parent="#cats"
           >
-            {data.filter((prod) => prod.category === 'sofa').map((product, i) =>
+            {data.reverse().filter((prod) => prod.category === 'sofa')?.map((product, i) =>
               <div
                 key={i}
                 className="info d-flex justify-content-between align-items-center ms-3 mb-2"
@@ -189,7 +189,7 @@ const ListProducts = ({ data, refetch, active }) => {
             id="chairs"
             data-bs-parent="#cats"
           >
-            {data.filter((prod) => prod.category === 'chair').map((product, i) =>
+            {data.reverse().filter((prod) => prod.category === 'chair')?.map((product, i) =>
               <div
                 key={i}
                 className="info d-flex justify-content-between align-items-center ms-3 mb-2"
@@ -247,12 +247,11 @@ const Products = ({published}) => {
       <h1 className="text-center mb-4">{!published ? "[АРХИВ] " : ""}Список товаров</h1>
       <div className="wrapper ">
         <SearchBar products={products} setSearchResults={setSearchResults} />
-        {/* <Filter products={products} setSearchResults={setSearchResults}  /> */}
-        <ListProducts data={searchResults.filter((prod) => prod.active === published)} refetch={refetch} active={published}/>
-
         <Link to="add">
           <button className="btn btn-cp bg-cp-nephritis rounded-pill w-100">Добавить новый товар</button>
         </Link>
+        {/* <Filter products={products} setSearchResults={setSearchResults}  /> */}
+        <ListProducts data={searchResults.filter((prod) => prod.active === published)} refetch={refetch} active={published}/>
       </div>
     </div>
   );
