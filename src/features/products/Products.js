@@ -251,7 +251,7 @@ const Products = ({published}) => {
           <button className="btn btn-cp bg-cp-nephritis rounded-pill w-100">Добавить новый товар</button>
         </Link>
         {/* <Filter products={products} setSearchResults={setSearchResults}  /> */}
-        <ListProducts data={searchResults.filter((prod) => prod.active === published)} refetch={refetch} active={published}/>
+        <ListProducts data={searchResults?.filter((prod) => prod.active === published)} refetch={refetch} active={published}/>
       </div>
     </div>
   );

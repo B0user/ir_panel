@@ -16,6 +16,7 @@ const AddProduct = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [link, setLink] = useState("");
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -51,6 +52,7 @@ const AddProduct = () => {
           name: name,
           description: description,
           price: price,
+          link: link,
           thumb_path: result.data.path 
         })
       );
@@ -60,6 +62,7 @@ const AddProduct = () => {
       setName("");
       setDescription("");
       setPrice("");
+      setLink("");
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -120,6 +123,16 @@ const AddProduct = () => {
               onChange={(e) => setPrice(e.target.value.toString())}
               value={price}
               className="form-control"
+              required
+            />
+            
+            <label htmlFor="link" className="form-label" >Ссылка на товар:</label>
+            <input
+              className="form-control" 
+              type="text"
+              id="link"
+              onChange={(e) => setLink(e.target.value.toString())}
+              value={link}
               required
             />
 

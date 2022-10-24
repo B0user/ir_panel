@@ -18,6 +18,7 @@ const ReadProduct = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [link, setLink] = useState("");
   const [thumb, setThumb] = useState("");
 
   const [errMsg, setErrMsg] = useState("");
@@ -37,6 +38,7 @@ const ReadProduct = () => {
     setName(info.name); 
     setDescription(info.description);
     setPrice(info.price);
+    setLink(info.link);
     return info;
   }));
 
@@ -70,6 +72,7 @@ const ReadProduct = () => {
             name: name,
             description: description,
             price: price,
+            link: link,
             thumb_path: result.data.path 
           })
         );
@@ -80,7 +83,8 @@ const ReadProduct = () => {
           JSON.stringify({ 
             name: name,
             description: description,
-            price: price
+            price: price,
+            link: link
           })
         );
       }
@@ -89,6 +93,7 @@ const ReadProduct = () => {
       setName("");
       setDescription("");
       setPrice("");
+      setLink("");
       setThumb("");
     } catch (err) {
       if (!err?.response) {
@@ -108,6 +113,7 @@ const ReadProduct = () => {
       setName("");
       setDescription("");
       setPrice("");
+      setLink("");
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -170,6 +176,18 @@ const ReadProduct = () => {
                 setPrice(e.target.value.toString());  
                 setChanged(true);}}
             value={price}
+            required
+          />
+
+          <label htmlFor="link" className="form-label" >Ссылка на товар:</label>
+          <input
+            className="form-control" 
+            type="text"
+            id="link"
+            onChange={(e) => {
+                setLink(e.target.value.toString());  
+                setChanged(true);}}
+            value={link}
             required
           />
           <label htmlFor="thumb" className="form-label">Загрузить обложку</label> 
