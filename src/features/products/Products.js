@@ -1,8 +1,8 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -52,8 +52,7 @@ const SearchBar = ({ products, setSearchResults }) => {
 //     </div>
 //   )
 // }
-
-const ListProducts = ({ data, refetch, active }) => {
+const ProductRecord = ({product, refetch}) => {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
 
@@ -63,8 +62,7 @@ const ListProducts = ({ data, refetch, active }) => {
       return;
     }
     try {
-      if(active) await axiosPrivate.delete(`/products/${id}`);
-      else await axiosPrivate.post(`/products/${id}/restore`);
+      await axiosPrivate.put(`/products/${id}/archivate`);
       refetch();
     } catch (err) {
       console.error(err);
@@ -83,6 +81,38 @@ const ListProducts = ({ data, refetch, active }) => {
     }
   };
 
+  return(
+    <div
+      key={product._id}
+      className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom"
+    >
+      <li>
+        {product?.name}
+      </li>
+      <div className="icons">
+        <button
+          className="btn btn-primary me-2 rounded-pill"
+          onClick={() => readProduct(product._id)}
+        >
+          Больше
+        </button>
+        <span className="ms-2">
+          <FontAwesomeIcon
+            icon={faMinus}
+            onClick={() => deleteProduct(product._id)}
+          />
+        </span>
+        <span className="ms-2">
+          <Link to="add">
+            <FontAwesomeIcon icon={faPlus}/>
+          </Link>
+        </span>
+      </div>
+    </div>
+  )
+}
+
+const ListProducts = ({ data, refetch }) => {
   return (
     <>
     {data?.length ? (
@@ -100,34 +130,8 @@ const ListProducts = ({ data, refetch, active }) => {
             id="carpets"
             data-bs-parent="#cats"
           >
-            {data.reverse().filter((prod) => prod.category === 'carpet')?.map((product, i) => (
-              <div
-                key={i}
-                className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom"
-              >
-                <li>
-                  {product?.name}
-                </li>
-                <div className="icons">
-                  <button
-                    className="btn btn-primary me-2 rounded-pill"
-                    onClick={() => readProduct(product._id)}
-                  >
-                    Больше
-                  </button>
-                  <span className="ms-2">
-                    <FontAwesomeIcon
-                      icon={faMinus}
-                      onClick={() => deleteProduct(product._id)}
-                    />
-                  </span>
-                  <span className="ms-2">
-                    <Link to="add">
-                      <FontAwesomeIcon icon={faPlus}/>
-                    </Link>
-                  </span>
-                </div>
-              </div>
+            {data.reverse().filter((prod) => prod.category === 'carpet')?.map((product) => (
+              <ProductRecord product={product} refetch={refetch} />
             ))}
           </ul>
         </li>
@@ -144,35 +148,8 @@ const ListProducts = ({ data, refetch, active }) => {
             id="sofas"
             data-bs-parent="#cats"
           >
-            {data.reverse().filter((prod) => prod.category === 'sofa')?.map((product, i) =>
-              <div
-                key={i}
-                className="info d-flex justify-content-between align-items-center ms-3 mb-2"
-              >
-                <hr />
-                <li>
-                  {product.name}
-                </li>
-                <div className="icons">
-                  <button
-                    className="btn btn-primary me-2 rounded-pill"
-                    onClick={() => readProduct(product._id)}
-                  >
-                    Больше
-                  </button>
-                  <span className="ms-2">
-                    <FontAwesomeIcon
-                      icon={faMinus}
-                      onClick={() => deleteProduct(product._id)}
-                    />
-                  </span>
-                  <span className="ms-2">
-                    <Link to="add">
-                      <FontAwesomeIcon icon={faPlus}/>
-                    </Link>
-                  </span>
-                </div>
-              </div>
+            {data.reverse().filter((prod) => prod.category === 'sofa')?.map((product) =>
+              <ProductRecord product={product} refetch={refetch} />
             )}
           </ul>
         </li>
@@ -189,34 +166,8 @@ const ListProducts = ({ data, refetch, active }) => {
             id="chairs"
             data-bs-parent="#cats"
           >
-            {data.reverse().filter((prod) => prod.category === 'chair')?.map((product, i) =>
-              <div
-                key={i}
-                className="info d-flex justify-content-between align-items-center ms-3 mb-2"
-              >
-                <li>
-                  {product.name}
-                </li>
-                <div className="icons">
-                  <button
-                    className="btn btn-primary me-2 rounded-pill"
-                    onClick={() => readProduct(product._id)}
-                  >
-                    Больше
-                  </button>
-                  <span className="ms-2">
-                    <FontAwesomeIcon
-                      icon={faMinus}
-                      onClick={() => deleteProduct(product._id)}
-                    />
-                  </span>
-                  <span className="ms-2">
-                    <Link to="add">
-                      <FontAwesomeIcon icon={faPlus}/>
-                    </Link>
-                  </span>
-                </div>
-              </div>
+            {data.reverse().filter((prod) => prod.category === 'chair')?.map((product) =>
+              <ProductRecord product={product} refetch={refetch} />
             )}
           </ul>
         </li>
@@ -251,7 +202,7 @@ const Products = ({published}) => {
           <button className="btn btn-cp bg-cp-nephritis rounded-pill w-100">Добавить новый товар</button>
         </Link>
         {/* <Filter products={products} setSearchResults={setSearchResults}  /> */}
-        <ListProducts data={searchResults?.filter((prod) => prod.active === published)} refetch={refetch} active={published}/>
+        <ListProducts data={searchResults?.filter((prod) => prod.active === published)} refetch={refetch}/>
       </div>
     </div>
   );

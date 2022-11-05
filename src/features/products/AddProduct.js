@@ -45,7 +45,7 @@ const AddProduct = () => {
         }
       )
 
-      const response = await axiosPrivate.post(
+      await axiosPrivate.post(
         ADDPRODUCT_URL,
         JSON.stringify({ 
           category: category,
