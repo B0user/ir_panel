@@ -4,9 +4,45 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Link, Navigate, useParams } from "react-router-dom";
 import QRCode from "../qrcodes/QRCode";
 import {BASE_URL} from "../../config";
+// Design
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArchive } from "@fortawesome/free-solid-svg-icons";
 
 
 const UPLOAD_URL   = '/files/upload/images';
+
+const ModelRecord = ({model, refetch, link}) => {
+  const axiosPrivate = useAxiosPrivate();
+  const archivateModel = async (id) => {
+    if (!id) {
+      console.error("Empty ID");
+      return;
+    }
+    try {
+      await axiosPrivate.put(`/models/exact/${id}/archivate`);
+      refetch();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom">
+      <li>
+        {model.active ? model.size : `[АРХИВ] ${model.size}`}
+        <a target="_blank" rel="noreferrer" href={`${link}?size=${model.size}`}> Ссылка</a>
+      </li>
+      <div className="icons">
+        <span className="ms-2">
+          <FontAwesomeIcon
+            icon={faArchive}
+            onClick={() => archivateModel(model._id)}
+          />
+        </span>
+      </div>
+    </div>
+  )
+}
 
 const ReadProduct = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -15,6 +51,7 @@ const ReadProduct = () => {
   const userRef = useRef();
   const errRef = useRef();
 
+  const [clientID, setClientID] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -31,10 +68,11 @@ const ReadProduct = () => {
     setErrMsg("");
   }, []);
 
-  const {data:hasModel} = useQuery(['models-for-product'], () => axiosPrivate.get(`/models/${id}`).then((res)=> res.data));
+  const {data:variations, refetch} = useQuery(['models-for-product'], () => axiosPrivate.get(`/mv/models/${id}`).then((res)=> res.data));
 
   const {error, isLoading, isError} = useQuery(['product-info'], () => axiosPrivate.get(`/products/${id}`).then((res)=> {
     const info = res.data[0];
+    setClientID(info.client_id);
     setName(info.name); 
     setDescription(info.description);
     setPrice(info.price);
@@ -203,12 +241,19 @@ const ReadProduct = () => {
           required
           />
           <br />
-          {hasModel?.length ?
-            <div className="container-fluid text-white bg-primary text-center py-2">
-              <span>Link to model: <Link to={`${BASE_URL}/modelview/${id}`}>{`inroom.tech/modelview/${id}`}</Link></span>
-              <QRCode url={`${BASE_URL}/modelview/${id}`} isImage={false} isButton={true}/>
+          {variations?.length ?
+            <>
+            <div className="bg-primary container-fluid d-flex flex-column flex-wrap justify-content-center py-2 text-center text-white">
+              <span>Link to model: <a target="_blank" rel="noreferrer" href={`${BASE_URL}/modelview/${clientID}/${id}`}>{`inroom.tech/modelview/${clientID}/${id}`}</a></span>
+              <QRCode url={`${BASE_URL}/modelview/${clientID}/${id}`} isImage={false} isButton={true}/>
             </div>
-            : <></>
+            <div className="py-3 text-center">
+              <h3>Модели:</h3>
+              {variations.map(model => <ModelRecord key={model._id} model={model} refetch={refetch} link={`${BASE_URL}/modelview/${clientID}/${id}`}/>)}
+            </div>
+            </>
+            
+            : <p>Нет никаких моделей у товара</p>
           }
           <br />
           <div>

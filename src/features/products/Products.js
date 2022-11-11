@@ -82,10 +82,7 @@ const ProductRecord = ({product, refetch}) => {
   };
 
   return(
-    <div
-      key={product._id}
-      className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom"
-    >
+    <div className="info d-flex justify-content-between align-items-center ms-3 py-1 border-bottom">
       <li>
         {product?.name}
       </li>
@@ -131,7 +128,7 @@ const ListProducts = ({ data, refetch }) => {
             data-bs-parent="#cats"
           >
             {data.reverse().filter((prod) => prod.category === 'carpet')?.map((product) => (
-              <ProductRecord product={product} refetch={refetch} />
+              <ProductRecord key={product._id} product={product} refetch={refetch} />
             ))}
           </ul>
         </li>
@@ -149,7 +146,7 @@ const ListProducts = ({ data, refetch }) => {
             data-bs-parent="#cats"
           >
             {data.reverse().filter((prod) => prod.category === 'sofa')?.map((product) =>
-              <ProductRecord product={product} refetch={refetch} />
+              <ProductRecord key={product._id} product={product} refetch={refetch} />
             )}
           </ul>
         </li>
@@ -167,7 +164,7 @@ const ListProducts = ({ data, refetch }) => {
             data-bs-parent="#cats"
           >
             {data.reverse().filter((prod) => prod.category === 'chair')?.map((product) =>
-              <ProductRecord product={product} refetch={refetch} />
+              <ProductRecord key={product._id} product={product} refetch={refetch} />
             )}
           </ul>
         </li>
