@@ -14,7 +14,7 @@ const LoginRedir = () => {
     return (
         roles 
             ? roles.includes(1101) 
-                ? <Navigate to="/panel" replace />
+                ? <Navigate to="/panel/products" replace />
                 : <Navigate to="/login" replace />
             : <Navigate to="/login" replace />
     );    
