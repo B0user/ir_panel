@@ -3,6 +3,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { toast } from 'react-toastify';
 
 const ADDPRODUCT_URL = "/products";
 const UPLOAD_URL = "/files/upload/images";
@@ -56,6 +57,16 @@ const AddProduct = () => {
           thumb_path: result.data.path,
         })
       );
+      toast.success('Продукт добавлен', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
       setSuccess(true);
       //clear state and controlled inputs
       setCategory("");
@@ -167,7 +178,7 @@ const AddProduct = () => {
               id="thumb"
               onChange={(e) => setThumb(e.target.files[0])}
               className="form-control"
-              required
+              disabled
             />
 
             {/* Table for SPOMA CHAINS */}

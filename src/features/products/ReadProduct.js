@@ -7,6 +7,7 @@ import { BASE_URL } from "../../config";
 // Design
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { toast } from 'react-toastify';
 
 const UPLOAD_URL = "/files/upload/images";
 
@@ -81,6 +82,16 @@ const ReadProduct = () => {
           })
         );
       }
+      toast.success('Продукт обновлен', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
       setSuccess(true);
       //clear state and controlled inputs
       setName("");
@@ -100,6 +111,10 @@ const ReadProduct = () => {
 
   const handleDelete = async (e) => {
     e.preventDefault();
+    await deleteAction();
+  };
+
+  const deleteAction = async () => {
     try {
       await axiosPrivate.delete(`/products/${id}`);
       setSuccess(true);
@@ -115,7 +130,7 @@ const ReadProduct = () => {
       }
       errRef.current.focus();
     }
-  };
+  }
 
   const handleArchivateModel = async (id) => {
     if (!id) {
@@ -124,8 +139,28 @@ const ReadProduct = () => {
     }
     try {
       await axiosPrivate.put(`/models/exact/${id}/archivate`);
+      toast.info('Архивация модели завершена', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
       refetch();
     } catch (err) {
+      toast.error(`Ошибка при архивации модели: ${err}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
       console.error(err);
     }
   };
@@ -231,6 +266,7 @@ const ReadProduct = () => {
             setThumb(e.target.files[0]);
             setChangedFile(true);
           }}
+          disabled
           className="form-control"
         />
         <table className="table spoma-table mt-3">

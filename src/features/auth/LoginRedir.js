@@ -10,12 +10,14 @@ const LoginRedir = () => {
         : undefined;
     
     const roles = decoded?.UserInfo?.roles || [];
-
+    console.log(roles);
     return (
         roles 
             ? roles.includes(1101) 
                 ? <Navigate to="/panel/products" replace />
-                : <Navigate to="/login" replace />
+                : roles.includes(2837) 
+                    ? <Navigate to="/support" replace />
+                    : <Navigate to="/login" replace />
             : <Navigate to="/login" replace />
     );    
 }

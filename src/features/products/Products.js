@@ -5,6 +5,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { toast } from 'react-toastify';
 
 const SearchBar = ({ products, setSearchResults }) => {
   const handleSubmit = (e) => e.preventDefault()
@@ -23,7 +24,7 @@ const SearchBar = ({ products, setSearchResults }) => {
       <input
         type="search"
         className="form-control rounded"
-        placeholder="Search"
+        placeholder="Название товара"
         aria-label="Search"
         aria-describedby="search-addon"
         onChange={handleSearchChange}
@@ -62,9 +63,29 @@ const ProductRecord = ({product, refetch}) => {
       return;
     }
     try {
+      toast.info('Архивация продукта завершена', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        });
       await axiosPrivate.put(`/products/${id}/archivate`);
       refetch();
     } catch (err) {
+      toast.error('Ошибка при архивации продукта', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
       console.error(err);
     }
   };

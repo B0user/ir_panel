@@ -1,4 +1,6 @@
 import { Outlet, Link, useNavigate} from "react-router-dom"
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const PanelLayout = ({ role }) => {
   const navigate = useNavigate();
@@ -9,6 +11,7 @@ const PanelLayout = ({ role }) => {
           <div className="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
             
             <ul className="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+
               {role === 1101 ? (
                 <>
                   {/* <li className="nav-item">
@@ -44,13 +47,39 @@ const PanelLayout = ({ role }) => {
                   <li>
                     <Link to="/panel/products/archieve" className="nav-link px-0"> <span className="d-none d-sm-inline">Архив</span></Link>
                   </li>
+                  <br />
+                  <li>
+                    <Link to="/panel/support" className="nav-link px-0"> <span className="d-none d-sm-inline">Поддержка</span></Link>
+                  </li>
                 </>
-              ) : navigate('')}
+              ) : role === 2837 ? (
+                <>
+                  <li className="w-100">
+                    <Link to="/support" className="nav-link px-0"> <span className="d-none d-sm-inline">Активные</span></Link>
+                  </li>
+                  <li>
+                    <Link to="/support/completed" className="nav-link px-0"> <span className="d-none d-sm-inline">Закрытые</span></Link>
+                  </li>
+                </>
+              ) : navigate('')
+              }
             </ul>
           </div>
         </aside>
         <article className="col py-3">
           <Outlet/>
+          <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         </article>
       </div>
     </div>
