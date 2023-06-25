@@ -19,6 +19,7 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [thumb, setThumb] = useState("");
+  const [images, setImages] = useState([]);
   const [spomaChain, setSpomaChain] = useState([
     { size: "", price: "", old_price: "" },
   ]);
@@ -33,30 +34,30 @@ const AddProduct = () => {
   useEffect(() => {
     setErrMsg("");
   }, [name, description, spomaChain]);
-
+  
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
+  
       const formData = new FormData();
       formData.append("thumb", thumb);
-      // Add files to media
-      const result = await axiosPrivate.post(UPLOAD_URL, formData, {
+      for (let i = 0; i < images.length; i++) {
+        formData.append("images", images[i]);
+      }
+
+      formData.append("category", category);
+      formData.append("name", name);
+      formData.append("description", description);
+      formData.append("link", link);
+      formData.append("spoma_chain", JSON.stringify(spomaChain));
+  
+      // Send the formData object to the server
+      await axiosPrivate.post(ADDPRODUCT_URL, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      await axiosPrivate.post(
-        ADDPRODUCT_URL,
-        JSON.stringify({
-          category: category,
-          name: name,
-          description: description,
-          spoma_chain: spomaChain,
-          link: link,
-          thumb_path: result.data.path,
-        })
-      );
+      
       toast.success('Продукт добавлен', {
         position: "top-right",
         autoClose: 2000,
@@ -74,6 +75,7 @@ const AddProduct = () => {
       setDescription("");
       setSpomaChain([{ size: "", price: "", old_price: "" }]);
       setLink("");
+  
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -178,8 +180,19 @@ const AddProduct = () => {
               id="thumb"
               onChange={(e) => setThumb(e.target.files[0])}
               className="form-control"
-              disabled
             />
+            <label htmlFor="images" className="form-label">
+              Загрузить дополнительные фото
+            </label>
+            <input
+              name="images"
+              type="file"
+              id="images"
+              onChange={(e) => setImages(e.target.files)}
+              className="form-control"
+              multiple
+            />
+
 
             {/* Table for SPOMA CHAINS */}
             <table className="table spoma-table mt-3">

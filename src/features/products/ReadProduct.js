@@ -9,7 +9,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { toast } from 'react-toastify';
 
-const UPLOAD_URL = "/files/upload/images";
+const UPLOAD_THUMB_URL = "/files/upload/thumb";
+const UPLOAD_IMAGES_URL = "/files/upload/images";
 
 const ReadProduct = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -23,12 +24,14 @@ const ReadProduct = () => {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [thumb, setThumb] = useState("");
+  const [images, setImages] = useState("");
   const [spomaChain, setSpomaChain] = useState([]);
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
   const [changed, setChanged] = useState(false);
   const [changedFile, setChangedFile] = useState(false);
+  const [changedImages, setChangedImages] = useState(false);
 
   useEffect(() => {
     setErrMsg("");
@@ -55,33 +58,52 @@ const ReadProduct = () => {
       if (changedFile) {
         const formData = new FormData();
         formData.append("thumb", thumb);
-        const result = await axiosPrivate.post(UPLOAD_URL, formData, {
+      
+        let result = await axiosPrivate.post(UPLOAD_THUMB_URL, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-
-        await axiosPrivate.put(
-          `/products/${id}`,
-          JSON.stringify({
-            name: name,
-            description: description,
-            spoma_chain: spomaChain,
-            link: link,
-            thumb_path: result.data.path,
-          })
-        );
+      
+        await axiosPrivate.put(`/products/${id}`, {
+          name: name,
+          description: description,
+          spoma_chain: spomaChain,
+          link: link,
+          thumb_path: result.data.path,
+        });
+      } else if (changedImages) {
+        const formData = new FormData();
+        for (let i = 0; i < images.length; i++) {
+          formData.append("images", images[i]);
+        }
+      
+        let result = await axiosPrivate.post(UPLOAD_IMAGES_URL, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        console.log( result);
+      
+        const imagePaths = result.data.paths;
+        console.log( imagePaths);
+        
+        await axiosPrivate.put(`/products/${id}`, {
+          name: name,
+          description: description,
+          spoma_chain: spomaChain,
+          link: link,
+          image_paths: imagePaths,
+        });
       } else {
-        await axiosPrivate.put(
-          `/products/${id}`,
-          JSON.stringify({
-            name: name,
-            description: description,
-            spoma_chain: spomaChain,
-            link: link,
-          })
-        );
+        await axiosPrivate.put(`/products/${id}`, {
+          name: name,
+          description: description,
+          spoma_chain: spomaChain,
+          link: link,
+        });
       }
+      
       toast.success('Продукт обновлен', {
         position: "top-right",
         autoClose: 2000,
@@ -103,7 +125,7 @@ const ReadProduct = () => {
       if (!err?.response) {
         setErrMsg("No Server Response");
       } else {
-        setErrMsg("Update process failed");
+        setErrMsg(err.toString());
       }
       errRef.current.focus();
     }
@@ -255,6 +277,7 @@ const ReadProduct = () => {
           value={link}
           required
         />
+
         <label htmlFor="thumb" className="form-label">
           Загрузить обложку
         </label>
@@ -269,6 +292,24 @@ const ReadProduct = () => {
           disabled
           className="form-control"
         />
+
+        <label htmlFor="images" className="form-label">
+          Загрузить изображения
+        </label>
+        <input
+          name="images"
+          type="file"
+          id="images"
+          onChange={(e) => {
+            const files = Array.from(e.target.files);
+            setImages(files);
+            setChangedImages(true);
+          }}
+          multiple
+          className="form-control"
+        />
+
+
         <table className="table spoma-table mt-3">
           <thead>
             <tr>
@@ -369,7 +410,7 @@ const ReadProduct = () => {
           <button
             onClick={(e) => handleUpdate(e)}
             className="btn btn-cp bg-cp-nephritis col-8"
-            disabled={!changed && !changedFile ? true : false}
+            disabled={!changed && !changedFile && !changedImages ? true : false}
           >
             Обновить
           </button>
