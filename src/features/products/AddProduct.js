@@ -6,7 +6,7 @@ import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { toast } from 'react-toastify';
 
 const ADDPRODUCT_URL = "/products";
-const UPLOAD_URL = "/files/upload/thumb";
+const UPLOAD_THUMB_URL = "/files/upload/thumb";
 
 const AddProduct = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -41,22 +41,26 @@ const AddProduct = () => {
   
       const formData = new FormData();
       formData.append("thumb", thumb);
-      for (let i = 0; i < images.length; i++) {
-        formData.append("images", images[i]);
-      }
+      // for (let i = 0; i < images.length; i++) {
+      //   formData.append("images", images[i]);
+      // }
 
-      formData.append("category", category);
-      formData.append("name", name);
-      formData.append("description", description);
-      formData.append("link", link);
-      formData.append("spoma_chain", JSON.stringify(spomaChain));
-  
-      // Send the formData object to the server
-      await axiosPrivate.post(ADDPRODUCT_URL, formData, {
+      let result = await axiosPrivate.post(UPLOAD_THUMB_URL, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+  
+      await axiosPrivate.post(ADDPRODUCT_URL, {
+        category: category,
+        name: name,
+        description: description,
+        spoma_chain: spomaChain,
+        link: link,
+        thumb_path: result.data.path,
+      });
+
+
       
       toast.success('Продукт добавлен', {
         position: "top-right",
