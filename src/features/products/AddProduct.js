@@ -6,7 +6,7 @@ import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { toast } from 'react-toastify';
 
 const ADDPRODUCT_URL = "/products";
-const UPLOAD_URL = "/files/upload/images";
+const UPLOAD_URL = "/files/upload/thumb";
 
 const AddProduct = () => {
   const axiosPrivate = useAxiosPrivate();
