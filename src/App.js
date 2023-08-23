@@ -23,48 +23,71 @@ import ReadMessage from './features/support/ReadMessage';
 
 import Missing from './components/Missing';
 import Unauthorized from './components/Unauthorized';
+import ShowProducts from './features/products/ShowProducts';
+import { useState } from 'react';
+
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { ColorModeContext, useMode } from "./theme";
+
+import Topbar from "./scenes/global/Topbar";
+import Sidebar from "./scenes/global/Sidebar";
 
 function App() {
+  const [theme, colorMode] = useMode();
+  const [isSidebar, setIsSidebar] = useState(true);
+
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Login />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
-        <Route element={<PersistLogin />}>
-          <Route path="/redir" element={<LoginRedir />} />
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div className="app">
+        <main className="content">
+            <Topbar setIsSidebar={setIsSidebar} />
+            <Routes>
+            <Route path="/" element={<Layout />}>
+            <Route index element={<Login />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="unauthorized" element={<Unauthorized />} />
+            <Route element={<PersistLogin />}>
+              <Route path="/redir" element={<LoginRedir />} />
 
-          {/* Client Routing */} 
-          <Route element={<RequireAuth allowedRoles={[1101]} />}>
-            <Route path="panel" element={<PanelLayout role={1101}/>}>
-              <Route index element={<Client />}/>
-              <Route path="products">
-                <Route index element={<Products published={true}/>}/>
-                <Route path="archieve" element={<Products published={false}/>}/>
-                <Route path="add" element={<AddProduct />}/>
-                <Route path=":id" element={<ReadProduct />}/>
+              {/* Client Routing */} 
+              <Route element={<RequireAuth allowedRoles={[1101]} />}>
+              <Route path="panel" element={<PanelLayout role={1101}/>}>
+                  <Route index element={<Client />}/>
+                  <Route path="products">
+                    {/* <Route index element={<Products published={true}/>}/> */}
+                    {/*<Route path="archieve" element={<Products published={false}/>}/>
+                    <Route path="add" element={<AddProduct />}/>
+                    <Route path=":id" element={<ReadProduct />}/> */}
+                  <Route index element={<ShowProducts />}/>
+                    <Route path = "archieve" element = {<ShowProducts />}/>
+                  </Route>
+                  <Route path="support">
+                    <Route index element={<ClientChat />}/>
+                    <Route path=":id" element={<ClientChatMessages />}/>
+                  </Route>
+                </Route>
               </Route>
-              <Route path="support">
-                <Route index element={<ClientChat />}/>
-                <Route path=":id" element={<ClientChatMessages />}/>
+
+              {/* Support Routing */} 
+              <Route element={<RequireAuth allowedRoles={[2837]} />}>
+                <Route path="support" element={<PanelLayout role={2837}/>}>
+                  <Route index element={<Messages isClosed={false} isPublic={false}/>}/>
+                  <Route path="publicreports" element={<Messages isClosed={false} isPublic={true}/>}/>
+                  <Route path="completed" element={<Messages isClosed={true} isPublic={true}/>}/>
+                  <Route path=":id" element={<ReadMessage />}/>
+                </Route>
               </Route>
             </Route>
+            <Route path="*" element={<Missing />} />
           </Route>
-
-          {/* Support Routing */} 
-          <Route element={<RequireAuth allowedRoles={[2837]} />}>
-            <Route path="support" element={<PanelLayout role={2837}/>}>
-              <Route index element={<Messages isClosed={false} isPublic={false}/>}/>
-              <Route path="publicreports" element={<Messages isClosed={false} isPublic={true}/>}/>
-              <Route path="completed" element={<Messages isClosed={true} isPublic={true}/>}/>
-              <Route path=":id" element={<ReadMessage />}/>
-            </Route>
-          </Route>
-        </Route>
-        <Route path="*" element={<Missing />} />
-      </Route>
-    </Routes>
+        </Routes>
+        </main>
+        </div>
+    </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 
