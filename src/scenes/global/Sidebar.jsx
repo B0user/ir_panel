@@ -96,9 +96,9 @@ const Sidebar = () => {
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
                   alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={`../../assets/user.png`}
+                  width="50px"
+                  height="50px"
+                  src={`../favicon.png`}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
@@ -135,21 +135,21 @@ const Sidebar = () => {
               Data
             </Typography>
             <Item
-              title="Manage Products"
-              to="/team"
+              title="All Products"
+              to="/panel/products"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Contacts Information"
-              to="/contacts"
+              title="Add Product"
+              to="/panel/products/add"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Invoices Balances"
+              title="Archieve"
               to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}

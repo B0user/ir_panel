@@ -42,7 +42,7 @@ function App() {
         <CssBaseline />
         <div className="app">
         <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
+            
             <Routes>
             <Route path="/" element={<Layout />}>
             <Route index element={<Login />} />
@@ -56,13 +56,14 @@ function App() {
               <Route element={<RequireAuth allowedRoles={[1101]} />}>
               <Route path="panel" element={<PanelLayout role={1101}/>}>
                   <Route index element={<Client />}/>
+                
                   <Route path="products">
                     {/* <Route index element={<Products published={true}/>}/> */}
                     {/*<Route path="archieve" element={<Products published={false}/>}/>
                     <Route path="add" element={<AddProduct />}/>
                     <Route path=":id" element={<ReadProduct />}/> */}
                   <Route index element={<ShowProducts />}/>
-                    <Route path = "archieve" element = {<ShowProducts />}/>
+                    <Route path = "add" element = {<AddProduct />}/>
                   </Route>
                   <Route path="support">
                     <Route index element={<ClientChat />}/>
