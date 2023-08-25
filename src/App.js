@@ -64,6 +64,7 @@ function App() {
                     <Route path=":id" element={<ReadProduct />}/> */}
                   <Route index element={<ShowProducts />}/>
                     <Route path = "add" element = {<AddProduct />}/>
+                    <Route path = ":id" element = {<ReadProduct />}/>
                   </Route>
                   <Route path="support">
                     <Route index element={<ClientChat />}/>
