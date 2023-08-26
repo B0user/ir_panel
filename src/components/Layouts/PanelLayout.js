@@ -1,33 +1,40 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet} from "react-router-dom";
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 import Sidebar from "../../scenes/global/Sidebar";
-import { Height } from "@mui/icons-material";
-import { faHouseFloodWaterCircleArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { Box } from "@mui/material";
 
+const MainLayout = ({ children }) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        height: "100vh", // Задаем полную высоту видового окна
+      }}
+    >
+      <Sidebar />
+      <Box
+        sx={{
+          flex: 1,
+          overflow: "auto", // Включаем прокрутку, если контент не влезает
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  );
+};
 
 const PanelLayout = ({ role }) => {
-  const navigate = useNavigate();
-  const [isSidebar, setIsSidebar] = useState(true);
 
-  const sidebarStyle = {
-    marginLeft: role === 1101 ? '0' : '', // Устанавливаем отступ только для роли 1101
-    paddingLeft: role === 1101 ? '0' : '', // Устанавливаем отступ только для роли 1101
-    backgroundColor: role === 1101 ? 'transparent' : '', // Устанавливаем фон только для роли 1101
-    height: role === 1101 ? '100%' : '',
-  };
 
   return (
-    <div className="container-fluid">
-      <div className="row flex-nowrap">
-        <aside className="col-auto col-md-3 col-xl-2 bg-cp-nephritis" style={sidebarStyle}>
-          <div>
-            {role === 1101 && <Sidebar isSidebar = {isSidebar} />}
-          </div>
-        </aside>
-        <article className={`col py-3 ${role === 1101 ? 'sidebar-expanded' : ''}`}>
-          <Outlet/>
+    <div className="container-fluid" style ={{ paddingLeft: 0}}>
+      {role === 1101 ? (
+        <MainLayout>
+          {/* Внутренние компоненты для роли 1101 */}
+          {/* Sidebar и другие компоненты */}
+          <Outlet />
           <ToastContainer
             position="top-center"
             autoClose={2000}
@@ -40,8 +47,13 @@ const PanelLayout = ({ role }) => {
             pauseOnHover
             theme="dark"
           />
-        </article>
-      </div>
+        </MainLayout>
+      ) : (
+        <div>
+          {/* Компоненты для остальных ролей */}
+          <Outlet />
+        </div>
+      )}
     </div>
   );
 }

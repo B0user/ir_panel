@@ -17,6 +17,7 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import { Outlet, useNavigate} from "react-router-dom";
+import { Chip } from "@mui/material";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -82,7 +83,7 @@ const Sidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                  INROOM
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -112,7 +113,7 @@ const Sidebar = () => {
                   Admin
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  INROOM ADMIN PANEL
+                  ПАНЕЛЬ УПРАВЛЕНИЯ INROOM
                 </Typography>
               </Box>
             </Box>
@@ -120,8 +121,15 @@ const Sidebar = () => {
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
-              title="Dashboard"
-              to="/"
+              title={
+                <div>
+            <Typography variant="h5" component="div" display="inline">
+              Статистика
+            </Typography>{" "}
+            <Chip label="DEMO" color="secondary" />
+            </div>
+            }
+              to="/panel/products/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -132,31 +140,31 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Data
+              Продукты
             </Typography>
             <Item
-              title="All Products"
+              title="Все товары"
               to="/panel/products"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Add Product"
+              title="Добавить товар"
               to="/panel/products/add"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Archieve"
-              to="/invoices"
+              title="Aрхив"
+              to="/panel/products/archieve"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
 
-            <Typography
+            {/* <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -219,7 +227,7 @@ const Sidebar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+          /> */}
           </Box>
         </Menu>
       </ProSidebar>

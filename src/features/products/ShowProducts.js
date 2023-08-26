@@ -1,16 +1,19 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataTeam } from "../../mockData";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import { mockDataTeam } from "../../data/mockData";
 import Header from "../../components/Header";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Outlet, Link, useNavigate} from "react-router-dom"
+import Button from "@mui/material/Button";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import EditIcon from "@mui/icons-material/Edit";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { API_URL } from "../../config";
 
 const ShowProducts = () => {
     const axiosPrivate = useAxiosPrivate();
@@ -35,74 +38,71 @@ const ShowProducts = () => {
      simplifiedData = products?.map(item => ({
           id: item._id,
           name: item.name,
-          price: item.spoma_chain[0]?.price || "", // Возможно, нужно скорректировать доступ к цене
-          active: item.active
+          link: `inroom.tech/modelview/${item.client_id}/${item._id}`, 
+          status: item.active ? "published" : "archived", 
+          editlink: `${item._id}`
         }));
     }
     console.log(simplifiedData);
     
     const colors = tokens(theme.palette.mode);
     const columns = [
-      { field: "id", headerName: "ID" },
+      { field: "id", headerName: "ID", width: 250 },
+      { field: "name", headerName: "Наименование", width: 200 },
       {
-        field: "name",
-        headerName: "Name",
-        flex: 1,
-        cellClassName: "name-column--cell",
+        field: "link",
+        headerName: "Ссылка",
+        width: 110,
+        renderCell: (params) => (
+          <CopyToClipboard text={params.value}>
+            <Button variant="contained" color="primary" onClick={() => {
+              // Показываем уведомление при успешном копировании
+              toast.success("Ссылка скопирована!");
+            }}>
+              Ссылка
+            </Button>
+          </CopyToClipboard>
+        ),
       },
       {
-        field: "price",
-        headerName: "Price",
-        type: "number",
-        headerAlign: "left",
-        align: "left",
+        field: "status",
+        headerName: "Статус",
+        width: 280,
+        renderCell: (params) => (
+          <ToggleButtonGroup
+            value={params.value}
+            exclusive
+            onChange={() => {
+              // Handle status toggle button click here
+            }}
+          >
+            <ToggleButton value="archived" aria-label="archived">
+              Архивирован
+            </ToggleButton>
+            <ToggleButton value="published" aria-label="published">
+              Опубликован
+            </ToggleButton>
+          </ToggleButtonGroup>
+        ),
+      },{
+        field: "editlink", // Пустой поле для кнопки без заголовка
+        headerName: "",
+        width: 110,
+        renderCell: (params) => (
+          <Link to={params.value}>
+            <Button
+              variant="contained"
+              color="secondary"
+            >
+              Изменить
+            </Button>
+          </Link>
+        ),
       },
-      {
-        field: "isActive",
-        headerName: "Active",
-        flex: 1,
-      }
-    //   },
-    //   {
-    //     field: "email",
-    //     headerName: "Email",
-    //     flex: 1,
-    //   },
-    //   {
-    //     field: "accessLevel",
-    //     headerName: "Access Level",
-    //     flex: 1,
-    //     renderCell: ({ row: { access } }) => {
-    //       return (
-    //         <Box
-    //           width="60%"
-    //           m="0 auto"
-    //           p="5px"
-    //           display="flex"
-    //           justifyContent="center"
-    //           backgroundColor={
-    //             access === "admin"
-    //               ? colors.greenAccent[600]
-    //               : access === "manager"
-    //               ? colors.greenAccent[700]
-    //               : colors.greenAccent[700]
-    //           }
-    //           borderRadius="4px"
-    //         >
-    //           {access === "admin" && <AdminPanelSettingsOutlinedIcon />}
-    //           {access === "manager" && <SecurityOutlinedIcon />}
-    //           {access === "user" && <LockOpenOutlinedIcon />}
-    //           <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
-    //             {access}
-    //           </Typography>
-    //         </Box>
-    //       );
-    //     },
-    //   },
     ];
     if(mockDataTeam) return (
       <Box m="20px">
-        <Header title="TEAM" subtitle="Managing the Team Members" />
+        <Header title="Список товаров" subtitle="Управление товарами" />
         <Box
           m="40px 0 0 0"
           height="75vh"
@@ -134,6 +134,7 @@ const ShowProducts = () => {
         >
           <DataGrid checkboxSelection rows={simplifiedData} columns={columns} />
         </Box>
+        
       </Box>
     );
   };

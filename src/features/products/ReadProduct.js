@@ -2,19 +2,45 @@ import { useRef, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { TextField } from "@mui/material";
 import QRCode from "../qrcodes/QRCode";
 import { BASE_URL } from "../../config";
 // Design
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+import Header from "../../components/Header";
+
+import {
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button
+} from "@mui/material";
+
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Box,
+  Input,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const UPLOAD_THUMB_URL = "/files/upload/thumb";
 const UPLOAD_IMAGES_URL = "/files/upload/images";
 
 const ReadProduct = () => {
   const axiosPrivate = useAxiosPrivate();
+  const isNonMobile = useMediaQuery("(min-width:600px)");
   const { id } = useParams();
 
   const userRef = useRef();
@@ -38,16 +64,18 @@ const ReadProduct = () => {
     setErrMsg("");
   }, []);
 
-  const { error, isLoading, isError, refetch } = useQuery(["product-info"], () =>
-    axiosPrivate.get(`/products/${id}`).then((res) => {
-      const info = res.data[0];
-      setClientID(info.client_id);
-      setName(info.name);
-      setDescription(info.description);
-      setSpomaChain(info.spoma_chain);
-      setLink(info.link);
-      return info;
-    })
+  const { error, isLoading, isError, refetch } = useQuery(
+    ["product-info"],
+    () =>
+      axiosPrivate.get(`/products/${id}`).then((res) => {
+        const info = res.data[0];
+        setClientID(info.client_id);
+        setName(info.name);
+        setDescription(info.description);
+        setSpomaChain(info.spoma_chain);
+        setLink(info.link);
+        return info;
+      })
   );
 
   if (isLoading) return <span className="spinner-border" />;
@@ -59,13 +87,13 @@ const ReadProduct = () => {
       if (changedFile) {
         const formData = new FormData();
         formData.append("thumb", thumb);
-      
+
         let result = await axiosPrivate.post(UPLOAD_THUMB_URL, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-      
+
         await axiosPrivate.put(`/products/${id}`, {
           name: name,
           description: description,
@@ -78,17 +106,17 @@ const ReadProduct = () => {
         for (let i = 0; i < images.length; i++) {
           formData.append("images", images[i]);
         }
-      
+
         let result = await axiosPrivate.post(UPLOAD_IMAGES_URL, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
         });
-        console.log( result);
-      
+        console.log(result);
+
         const imagePaths = result.data.paths;
-        console.log( imagePaths);
-        
+        console.log(imagePaths);
+
         await axiosPrivate.put(`/products/${id}`, {
           name: name,
           description: description,
@@ -104,8 +132,8 @@ const ReadProduct = () => {
           link: link,
         });
       }
-      
-      toast.success('Продукт обновлен', {
+
+      toast.success("Продукт обновлен", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -114,7 +142,7 @@ const ReadProduct = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        });
+      });
       setSuccess(true);
       //clear state and controlled inputs
       setName("");
@@ -153,7 +181,7 @@ const ReadProduct = () => {
       }
       errRef.current.focus();
     }
-  }
+  };
 
   const handleArchivateModel = async (id) => {
     if (!id) {
@@ -162,7 +190,7 @@ const ReadProduct = () => {
     }
     try {
       await axiosPrivate.put(`/models/exact/${id}/archivate`);
-      toast.info('Архивация модели завершена', {
+      toast.info("Архивация модели завершена", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -171,7 +199,7 @@ const ReadProduct = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        });
+      });
       refetch();
     } catch (err) {
       toast.error(`Ошибка при архивации модели: ${err}`, {
@@ -183,7 +211,7 @@ const ReadProduct = () => {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        });
+      });
       console.error(err);
     }
   };
@@ -201,7 +229,7 @@ const ReadProduct = () => {
 
   const handleAddSpomaChain = () => {
     setChanged(true);
-    setSpomaChain([...spomaChain, { size: "", price: "", old_price: ""}]);
+    setSpomaChain([...spomaChain, { size: "", price: "", old_price: "" }]);
   };
 
   const handleRemoveSpomaChain = (id) => {
@@ -222,168 +250,261 @@ const ReadProduct = () => {
       >
         {errMsg}
       </p>
-      <h1 className="text-center">Информация о товаре</h1>
+      <Box m="20px">
+      <Header
+              title="Информация о товаре"
+              subtitle="Форма заполнения данных о товаре"
+            />
       <form>
-        <label htmlFor="cat" className="form-label">
-          Категория:
-        </label>
-        <select className="form-select" disabled>
-          <option value="">None</option>
-        </select>
-
-        <label htmlFor="name" className="form-label">
-          Наименование:
-        </label>
-        <input
-          className="form-control"
-          type="text"
-          id="name"
-          ref={userRef}
-          autoComplete="off"
-          onChange={(e) => {
-            setName(e.target.value);
-            setChanged(true);
+        <Box
+          display="grid"
+          gap="30px"
+          gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+          sx={{
+            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
           }}
-          value={name}
-          required
-        />
+        >
+          <FormControl fullWidth variant="filled">
+            <InputLabel htmlFor="cat">Категория:</InputLabel>
+            <Select className="form-select" enabled>
+              <MenuItem value="carpet">Ковры</MenuItem>
+              <MenuItem value="sofa">Диваны</MenuItem>
+              <MenuItem value="chair">Стулья</MenuItem>
+            </Select>
+          </FormControl>
 
-        <label htmlFor="description" className="form-label">
-          Описание:
-        </label>
-        <textarea
-          className="form-control"
-          rows="3"
-          id="description"
-          name="text"
-          onChange={(e) => {
-            setDescription(e.target.value);
-            setChanged(true);
-          }}
-          value={description}
-          required
-        />
+          <TextField
+            fullWidth
+            variant="filled"
+            type="text"
+            id="name"
+            inputRef={userRef}
+            autoComplete="off"
+            onChange={(e) => {
+              setName(e.target.value);
+              setChanged(true);
+            }}
+            value={name}
+            required
+            label="Наименование:"
+            multiline
+            rows={2}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            inputProps={{
+              style: {
+                fontSize: "16px", // Замените на нужный вам размер шрифта
+              },
+            }}
+          />
 
-        <label htmlFor="link" className="form-label">
-          Ссылка на товар:
-        </label>
-        <input
-          className="form-control"
-          type="text"
-          id="link"
-          onChange={(e) => {
-            setLink(e.target.value.toString());
-            setChanged(true);
-          }}
-          value={link}
-          required
-        />
+          <TextField
+            fullWidth
+            variant="filled"
+            multiline
+            rows={3}
+            id="description"
+            name="text"
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setChanged(true);
+            }}
+            value={description}
+            required
+            label="Описание:"
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
 
-        <label htmlFor="thumb" className="form-label">
-          Загрузить обложку
-        </label>
-        <input
-          name="thumb"
-          type="file"
-          id="thumb"
-          onChange={(e) => {
-            setThumb(e.target.files[0]);
-            setChangedFile(true);
-          }}
-          disabled
-          className="form-control"
-        />
+          <TextField
+            fullWidth
+            variant="filled"
+            label="Ссылка на товар"
+            type="text"
+            id="link"
+            onChange={(e) => {
+              setLink(e.target.value.toString());
+              setChanged(true);
+            }}
+            value={link}
+            required
+            multiline
+            rows={3}
+            sx={{ marginBottom: "16px" }}
+            inputProps={{
+              style: {
+                fontSize: "16px", // Замените на нужный вам размер шрифта
+              },
+            }}
+          />
 
-        <label htmlFor="images" className="form-label">
-          Загрузить изображения
-        </label>
-        <input
-          name="images"
-          type="file"
-          id="images"
-          onChange={(e) => {
-            const files = Array.from(e.target.files);
-            setImages(files);
-            setChangedImages(true);
-          }}
-          multiple
-          className="form-control"
-        />
+          <FormControl fullWidth variant="filled" sx={{ marginBottom: "16px" }}>
+            <InputLabel htmlFor="thumb" sx={{ fontSize: "20px" }} shrink>
+              Загрузить обложку
+            </InputLabel>
+            <Input
+              type="file"
+              id="thumb"
+              onChange={(e) => {
+                setThumb(e.target.files[0]);
+                setChangedFile(true);
+              }}
+              inputProps={{
+                accept: "image/*",
+                id: "thumb",
+              }}
+              sx={{ display: "none" }}
+              disabled
+            />
+            <InputAdornment position="end">
+              <IconButton component="label" htmlFor="thumb" color="secondary">
+                <CloudUploadIcon />
+                <input
+                  name="thumb"
+                  type="file"
+                  id="thumb"
+                  onChange={(e) => {
+                    setThumb(e.target.files[0]);
+                    setChangedFile(true);
+                  }}
+                  style={{ display: "none" }}
+                  disabled
+                />
+              </IconButton>
+            </InputAdornment>
+          </FormControl>
 
-
-        <table className="table spoma-table mt-3">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Размер</th>
-              <th scope="col">Цена</th>
-              <th scope="col">Старая цена</th>
-              <th scope="col">Модель</th>
-              <th scope="col">Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {spomaChain.map((chain, index) => (
-              <tr key={index}>
-                <th scope="row">{index + 1}</th>
-                <td>
-                  <input
-                    type="text"
-                    name="size"
-                    onChange={(e) => handleChangeSpomaChain(index, e)}
-                    value={chain.size}
-                    className="form-control-plaintext"
-                    required
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    name="price"
-                    onChange={(e) => handleChangeSpomaChain(index, e)}
-                    value={chain.price}
-                    className="form-control-plaintext"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    name="old_price"
-                    onChange={(e) => handleChangeSpomaChain(index, e)}
-                    value={chain.old_price}
-                    className="form-control-plaintext"
-                  />
-                </td>
-                <td>
-                  {chain.model
-                  ? chain.active
-                    ? (
-                      <a target="_blank" rel="noreferrer" href={`${BASE_URL}/modelview/${clientID}/${id}?size=${chain.size}`}>
-                        Ссылка
-                      </a>
-                    )
-                    : "АРХИВ "
-                  : "Нет модели "}
-                </td>
-                <td>
-                  <span className="ms-2">
-                    <FontAwesomeIcon
-                      icon={faMinus}
-                      onClick={() => chain.model ? handleArchivateModel(chain.model) : handleRemoveSpomaChain(index)}
-                    />
-                  </span>
-                  
-                  <span className="ms-2">
-                    <FontAwesomeIcon
-                      icon={faPlus}
-                      onClick={handleAddSpomaChain}
-                    />
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          <FormControl fullWidth variant="filled" sx={{ marginBottom: "16px" }}>
+            <InputLabel htmlFor="images" sx={{ fontSize: "20px" }} shrink>
+              Загрузить изображения
+            </InputLabel>
+            <Input
+              type="file"
+              id="images"
+              onChange={(e) => {
+                const files = Array.from(e.target.files);
+                setImages(files);
+                setChangedImages(true);
+              }}
+              inputProps={{
+                accept: "image/*",
+                id: "images",
+                multiple: true,
+              }}
+              sx={{ display: "none" }}
+              disabled
+            />
+            <InputAdornment position="end">
+              <IconButton component="label" htmlFor="images" color="secondary">
+                <CloudUploadIcon />
+                <input
+                  name="images"
+                  type="file"
+                  id="images"
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files);
+                    setImages(files);
+                    setChangedImages(true);
+                  }}
+                  inputProps={{
+                    accept: "image/*",
+                    id: "images",
+                    multiple: true,
+                  }}
+                  style={{ display: "none" }}
+                  disabled
+                />
+              </IconButton>
+            </InputAdornment>
+          </FormControl>
+        </Box>
+        
+        <TableContainer component={Paper}  sx={{ marginTop: "20px", backgroundColor: (theme) => theme.palette.primary.main,}}>
+  <Table className="spoma-table" sx={{ minWidth: 650 }}>
+    <TableHead>
+      <TableRow>
+        <TableCell>#</TableCell>
+        <TableCell>Размер</TableCell>
+        <TableCell>Цена</TableCell>
+        <TableCell>Старая цена</TableCell>
+        <TableCell>Модель</TableCell>
+        <TableCell>Действия</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {spomaChain.map((chain, index) => (
+        <TableRow key={index}>
+          <TableCell>{index + 1}</TableCell>
+          <TableCell>
+            <TextField
+              type="text"
+              name="size"
+              onChange={(e) => handleChangeSpomaChain(index, e)}
+              value={chain.size}
+              fullWidth
+              variant="standard"
+              required
+            />
+          </TableCell>
+          <TableCell>
+            <TextField
+              type="number"
+              name="price"
+              onChange={(e) => handleChangeSpomaChain(index, e)}
+              value={chain.price}
+              fullWidth
+              variant="standard"
+            />
+          </TableCell>
+          <TableCell>
+            <TextField
+              type="number"
+              name="old_price"
+              onChange={(e) => handleChangeSpomaChain(index, e)}
+              value={chain.old_price}
+              fullWidth
+              variant="standard"
+            />
+          </TableCell>
+          <TableCell>
+            {chain.model ? (
+              chain.active ? (
+                <Link
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${BASE_URL}/modelview/${clientID}/${id}?size=${chain.size}`}
+                >
+                  Ссылка
+                </Link>
+              ) : (
+                "АРХИВ"
+              )
+            ) : (
+              "Нет модели"
+            )}
+          </TableCell>
+          <TableCell>
+            <IconButton
+              color="secondary"
+              onClick={() =>
+                chain.model
+                  ? handleArchivateModel(chain.model)
+                  : handleRemoveSpomaChain(index)
+              }
+            >
+              <FontAwesomeIcon icon={faMinus} />
+            </IconButton>
+            <IconButton color="secondary" onClick={handleAddSpomaChain}>
+              <FontAwesomeIcon icon={faPlus} />
+            </IconButton>
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</TableContainer>
         <button
           className="w-100 btn btn-sm btn-primary mb-3"
           onClick={handleAddSpomaChain}
@@ -408,13 +529,17 @@ const ReadProduct = () => {
         </div>
         <br />
         <div>
-          <button
+          <Button
             onClick={(e) => handleUpdate(e)}
-            className="btn btn-cp bg-cp-nephritis col-8"
             disabled={!changed && !changedFile && !changedImages ? true : false}
+            fullWidth
+            variant="contained"
+            size="small"
+            color="secondary"
+            sx={{ marginBottom: "16px" , fontSize: "18px", fontWeight: "500", color: "white"}}
           >
             Обновить
-          </button>
+          </Button>
           <button
             onClick={(e) => handleDelete(e)}
             className="btn btn-cp bg-cp-pomegranate col-3 offset-1"
@@ -428,6 +553,7 @@ const ReadProduct = () => {
           <Link to="/panel/products">Отмена</Link>
         </span>
       </p>
+      </Box>
     </div>
   );
 };
