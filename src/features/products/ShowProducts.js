@@ -14,11 +14,23 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import EditIcon from "@mui/icons-material/Edit";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { API_URL } from "../../config";
+import {
+  InputBase,
+  IconButton,
+  InputAdornment, TextField 
+} from "@mui/material";
+import { Search } from '@mui/icons-material';
+
 
 const ShowProducts = () => {
     const axiosPrivate = useAxiosPrivate();
     const theme = useTheme();
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const [searchText, setSearchText] = useState('');
+
+
     const [searchResults, setSearchResults] = useState();
     
     const { data:products, error, isLoading, isSuccess, isError, refetch } = useQuery(
@@ -45,9 +57,24 @@ const ShowProducts = () => {
     }
     console.log(simplifiedData);
     
+
+
+
+    const handleSearchTextChange = (event) => {
+      setSearchText(event.target.value);
+    };
+    
+    const filteredRows = simplifiedData.filter((simplifiedData) =>
+      simplifiedData.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+
+
+
+
     const colors = tokens(theme.palette.mode);
     const columns = [
-      { field: "id", headerName: "ID", width: 250 },
+      // { field: "id", headerName: "ID", width: 250 },
       { field: "name", headerName: "Наименование", width: 200 },
       {
         field: "link",
@@ -101,8 +128,16 @@ const ShowProducts = () => {
       },
     ];
     if(mockDataTeam) return (
+
       <Box m="20px">
+
+
+
+
         <Header title="Список товаров" subtitle="Управление товарами" />
+
+      
+
         <Box
           m="40px 0 0 0"
           height="75vh"
@@ -132,7 +167,31 @@ const ShowProducts = () => {
             },
           }}
         >
-          <DataGrid checkboxSelection rows={simplifiedData} columns={columns} />
+        
+        <TextField
+          label="Search"
+          variant="outlined"
+          size="small"
+          fullWidth
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search />
+              </InputAdornment>
+            ),
+          }}
+          value={searchText}
+          onChange={handleSearchTextChange}
+        />  
+      
+        
+          {/* <DataGrid checkboxSelection rows={simplifiedData} columns={columns} /> */}
+          <DataGrid
+          rows={filteredRows}
+          columns={columns}
+          pageSize={5}
+          rowsPerPageOptions={[5, 10, 20]}
+          />
         </Box>
         
       </Box>
