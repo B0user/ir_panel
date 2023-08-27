@@ -35,6 +35,7 @@ function App() {
         <Route element={<PersistLogin />}>
           <Route path="/redir" element={<LoginRedir />} />
 
+<<<<<<< Updated upstream
           {/* Client Routing */} 
           <Route element={<RequireAuth allowedRoles={[1101]} />}>
             <Route path="panel" element={<PanelLayout role={1101}/>}>
@@ -44,6 +45,36 @@ function App() {
                 <Route path="archieve" element={<Products published={false}/>}/>
                 <Route path="add" element={<AddProduct />}/>
                 <Route path=":id" element={<ReadProduct />}/>
+=======
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Login />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="unauthorized" element={<Unauthorized />} />
+            <Route element={<PersistLogin />}>
+              <Route path="/redir" element={<LoginRedir />} />
+
+              {/* Client Routing */}
+              <Route element={<RequireAuth allowedRoles={[1101]} />}>
+        
+                <Route path="panel" element={<PanelLayout role={1101} />}>
+                  <Route index element={<Client />} />
+
+                  <Route path="products">
+                    <Route index element={<ShowProducts/>} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="add" element={<AddProduct />} />
+                    <Route path=":id" element={<ReadProduct />} />
+                  </Route>
+
+                  <Route path="support">
+                    <Route index element={<ClientChat />} />
+                    <Route path=":id" element={<ClientChatMessages />} />
+                  </Route>
+                </Route>
+                
+>>>>>>> Stashed changes
               </Route>
               <Route path="support">
                 <Route index element={<ClientChat />}/>
