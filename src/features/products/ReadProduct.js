@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Link, Navigate, useParams } from "react-router-dom";
 import QRCode from "../qrcodes/QRCode";
-import { BASE_URL } from "../../config";
+import { API_URL, BASE_URL } from "../../config";
 // Design
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -18,9 +18,10 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  Button
+  Button,
+  ImageList
 } from "@mui/material";
-
+import { ImageListItem } from '@mui/material';
 import {
   FormControl,
   InputLabel,
@@ -59,24 +60,73 @@ const ReadProduct = () => {
   const [changed, setChanged] = useState(false);
   const [changedFile, setChangedFile] = useState(false);
   const [changedImages, setChangedImages] = useState(false);
+  let isUnmounted = false;
 
   useEffect(() => {
     setErrMsg("");
+    // Create a flag to track whether the component is unmounted
+    isUnmounted = false;
+
+    // Perform your asynchronous operations here
+    // For example, an API request using axios
+    axiosPrivate.get(`/products/${id}`)
+      .then((res) => {
+        if (!isUnmounted) {
+          // Update the state only if the component is still mounted
+          // ...
+        }
+      })
+      .catch((error) => {
+        if (!isUnmounted) {
+          // Handle errors only if the component is still mounted
+          // ...
+        }
+      });
+
+    // Return a cleanup function
+    return () => {
+      // Set the flag to true when the component is about to unmount
+      isUnmounted = true;
+
+      // You can also cancel any ongoing operations here
+      // For example, cancel an axios request
+      // This depends on the specific library you are using for API requests
+    };
   }, []);
 
-  const { error, isLoading, isError, refetch } = useQuery(
-    ["product-info"],
-    () =>
-      axiosPrivate.get(`/products/${id}`).then((res) => {
-        const info = res.data[0];
-        setClientID(info.client_id);
-        setName(info.name);
-        setDescription(info.description);
-        setSpomaChain(info.spoma_chain);
-        setLink(info.link);
-        return info;
-      })
-  );
+  const { error, data:pr_info,isLoading, isSuccess, isError, refetch } = useQuery(
+      ["product-info"],
+      () =>
+        axiosPrivate.get(`/products/${id}`)
+          .then((res) => {
+            const info = res.data[0];
+            setClientID(info.client_id);
+            setName(info.name);
+            setDescription(info.description);
+            setSpomaChain(info.spoma_chain);
+            setLink(info.link);
+            setThumb(info.thumb_path);  
+            setImages(info.image_paths);
+            return info;
+          }),
+      {
+        // Add an onSuccess option to handle successful data fetching
+        onSuccess: () => {
+          // Make sure to check if the component is still mounted before updating the state
+          if (!isUnmounted) {
+            // Handle the successful data fetching here
+          }
+        },
+        // Add an onError option to handle errors
+        onError: (error) => {
+          // Make sure to check if the component is still mounted before handling the error
+          if (!isUnmounted) {
+            // Handle the error here
+          }
+        }
+      }
+    );
+
 
   if (isLoading) return <span className="spinner-border" />;
   if (isError) return <p>Что-то пошло не так... {error}</p>;
@@ -238,324 +288,340 @@ const ReadProduct = () => {
     values.splice(id, 1);
     if (values.length) setSpomaChain(values);
   };
-
-  return success ? (
-    <Navigate to="/panel/products" replace />
-  ) : (
-    <div>
-      <p
-        ref={errRef}
-        className={errMsg ? "errmsg" : "offscreen"}
-        aria-live="assertive"
-      >
-        {errMsg}
-      </p>
-      <Box m="20px">
-      <Header
-              title="Информация о товаре"
-              subtitle="Форма заполнения данных о товаре"
-            />
-      <form>
-        <Box
-          display="grid"
-          gap="30px"
-          gridTemplateColumns="repeat(2, minmax(0, 1fr))"
-          sx={{
-            "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-          }}
+  if (success) return (<Navigate to="/panel/products" replace />)
+  if(isSuccess) return (
+      <div>
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
         >
-          <FormControl fullWidth variant="filled">
-            <InputLabel htmlFor="cat">Категория:</InputLabel>
-            <Select className="form-select" enabled>
-              <MenuItem value="carpet">Ковры</MenuItem>
-              <MenuItem value="sofa">Диваны</MenuItem>
-              <MenuItem value="chair">Стулья</MenuItem>
-            </Select>
-          </FormControl>
-
-          <TextField
-            fullWidth
-            variant="filled"
-            type="text"
-            id="name"
-            inputRef={userRef}
-            autoComplete="off"
-            onChange={(e) => {
-              setName(e.target.value);
-              setChanged(true);
+          {errMsg}
+        </p>
+        <Box m="20px">
+        <Header
+                title="Информация о товаре"
+                subtitle="Форма заполнения данных о товаре"
+              />
+        <form>
+          <Box
+            display="grid"
+            gap="30px"
+            gridTemplateColumns="repeat(2, minmax(0, 1fr))"
+            sx={{
+              "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
             }}
-            value={name}
-            required
-            label="Наименование:"
-            multiline
-            rows={2}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            inputProps={{
-              style: {
-                fontSize: "16px", // Замените на нужный вам размер шрифта
-              },
-            }}
-          />
-
-          <TextField
-            fullWidth
-            variant="filled"
-            multiline
-            rows={3}
-            id="description"
-            name="text"
-            onChange={(e) => {
-              setDescription(e.target.value);
-              setChanged(true);
-            }}
-            value={description}
-            required
-            label="Описание:"
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-
-          <TextField
-            fullWidth
-            variant="filled"
-            label="Ссылка на товар"
-            type="text"
-            id="link"
-            onChange={(e) => {
-              setLink(e.target.value.toString());
-              setChanged(true);
-            }}
-            value={link}
-            required
-            multiline
-            rows={3}
-            sx={{ marginBottom: "16px" }}
-            inputProps={{
-              style: {
-                fontSize: "16px", // Замените на нужный вам размер шрифта
-              },
-            }}
-          />
-
-          <FormControl fullWidth variant="filled" sx={{ marginBottom: "16px" }}>
-            <InputLabel htmlFor="thumb" sx={{ fontSize: "20px" }} shrink>
-              Загрузить обложку
-            </InputLabel>
-            <Input
-              type="file"
-              id="thumb"
-              onChange={(e) => {
-                setThumb(e.target.files[0]);
-                setChangedFile(true);
-              }}
-              inputProps={{
-                accept: "image/*",
-                id: "thumb",
-              }}
-              sx={{ display: "none" }}
-              disabled
-            />
-            <InputAdornment position="end">
-              <IconButton component="label" htmlFor="thumb" color="secondary">
-                <CloudUploadIcon />
-                <input
-                  name="thumb"
-                  type="file"
-                  id="thumb"
-                  onChange={(e) => {
-                    setThumb(e.target.files[0]);
-                    setChangedFile(true);
-                  }}
-                  style={{ display: "none" }}
-                  disabled
-                />
-              </IconButton>
-            </InputAdornment>
-          </FormControl>
-
-          <FormControl fullWidth variant="filled" sx={{ marginBottom: "16px" }}>
-            <InputLabel htmlFor="images" sx={{ fontSize: "20px" }} shrink>
-              Загрузить изображения
-            </InputLabel>
-            <Input
-              type="file"
-              id="images"
-              onChange={(e) => {
-                const files = Array.from(e.target.files);
-                setImages(files);
-                setChangedImages(true);
-              }}
-              inputProps={{
-                accept: "image/*",
-                id: "images",
-                multiple: true,
-              }}
-              sx={{ display: "none" }}
-              disabled
-            />
-            <InputAdornment position="end">
-              <IconButton component="label" htmlFor="images" color="secondary">
-                <CloudUploadIcon />
-                <input
-                  name="images"
-                  type="file"
-                  id="images"
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files);
-                    setImages(files);
-                    setChangedImages(true);
-                  }}
-                  inputProps={{
-                    accept: "image/*",
-                    id: "images",
-                    multiple: true,
-                  }}
-                  style={{ display: "none" }}
-                  disabled
-                />
-              </IconButton>
-            </InputAdornment>
-          </FormControl>
-        </Box>
-        
-        <TableContainer component={Paper}  sx={{ marginTop: "20px", backgroundColor: (theme) => theme.palette.primary.main,}}>
-  <Table className="spoma-table" sx={{ minWidth: 650 }}>
-    <TableHead>
-      <TableRow>
-        <TableCell>#</TableCell>
-        <TableCell>Размер</TableCell>
-        <TableCell>Цена</TableCell>
-        <TableCell>Старая цена</TableCell>
-        <TableCell>Модель</TableCell>
-        <TableCell>Действия</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {spomaChain.map((chain, index) => (
-        <TableRow key={index}>
-          <TableCell>{index + 1}</TableCell>
-          <TableCell>
+          >
+            <FormControl fullWidth variant="filled">
+              <InputLabel htmlFor="cat">Категория:</InputLabel>
+              <Select className="form-select" enabled>
+                <MenuItem value="carpet">Ковры</MenuItem>
+                <MenuItem value="sofa">Диваны</MenuItem>
+                <MenuItem value="chair">Стулья</MenuItem>
+              </Select>
+            </FormControl>
+  
             <TextField
+              fullWidth
+              variant="filled"
               type="text"
-              name="size"
-              onChange={(e) => handleChangeSpomaChain(index, e)}
-              value={chain.size}
-              fullWidth
-              variant="standard"
+              id="name"
+              inputRef={userRef}
+              autoComplete="off"
+              onChange={(e) => {
+                setName(e.target.value);
+                setChanged(true);
+              }}
+              value={name}
               required
+              label="Наименование:"
+              multiline
+              rows={2}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                style: {
+                  fontSize: "16px", // Замените на нужный вам размер шрифта
+                },
+              }}
             />
-          </TableCell>
-          <TableCell>
+  
             <TextField
-              type="number"
-              name="price"
-              onChange={(e) => handleChangeSpomaChain(index, e)}
-              value={chain.price}
               fullWidth
-              variant="standard"
+              variant="filled"
+              multiline
+              rows={3}
+              id="description"
+              name="text"
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setChanged(true);
+              }}
+              value={description}
+              required
+              label="Описание:"
+              InputLabelProps={{
+                shrink: true,
+              }}
             />
-          </TableCell>
-          <TableCell>
+  
             <TextField
-              type="number"
-              name="old_price"
-              onChange={(e) => handleChangeSpomaChain(index, e)}
-              value={chain.old_price}
               fullWidth
-              variant="standard"
+              variant="filled"
+              label="Ссылка на товар"
+              type="text"
+              id="link"
+              onChange={(e) => {
+                setLink(e.target.value.toString());
+                setChanged(true);
+              }}
+              value={link}
+              required
+              multiline
+              rows={3}
+              sx={{ marginBottom: "16px" }}
+              inputProps={{
+                style: {
+                  fontSize: "16px", // Замените на нужный вам размер шрифта
+                },
+              }}
             />
-          </TableCell>
-          <TableCell>
-            {chain.model ? (
-              chain.active ? (
-                <Link
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${BASE_URL}/modelview/${clientID}/${id}?size=${chain.size}`}
-                >
-                  Ссылка
-                </Link>
-              ) : (
-                "АРХИВ"
-              )
-            ) : (
-              "Нет модели"
-            )}
-          </TableCell>
-          <TableCell>
-            <IconButton
-              color="secondary"
-              onClick={() =>
-                chain.model
-                  ? handleArchivateModel(chain.model)
-                  : handleRemoveSpomaChain(index)
-              }
-            >
-              <FontAwesomeIcon icon={faMinus} />
-            </IconButton>
-            <IconButton color="secondary" onClick={handleAddSpomaChain}>
-              <FontAwesomeIcon icon={faPlus} />
-            </IconButton>
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-</TableContainer>
-        <button
-          className="w-100 btn btn-sm btn-primary mb-3"
-          onClick={handleAddSpomaChain}
-        >
-          Добавить размер
-        </button>
-        <br />
-        <div className="bg-primary container-fluid d-flex flex-column flex-wrap justify-content-center py-2 text-center text-white">
-          <span>
-            Ссылка на примерку:{" "}
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href={`${BASE_URL}/modelview/${clientID}/${id}`}
-            >{`inroom.tech/modelview/${clientID}/${id}`}</a>
-          </span>
-          <QRCode
-            url={`${BASE_URL}/modelview/${clientID}/${id}`}
-            isImage={false}
-            isButton={true}
-          />
-        </div>
-        <br />
-        <div>
-          <Button
-            onClick={(e) => handleUpdate(e)}
-            disabled={!changed && !changedFile && !changedImages ? true : false}
-            fullWidth
-            variant="contained"
-            size="small"
-            color="secondary"
-            sx={{ marginBottom: "16px" , fontSize: "18px", fontWeight: "500", color: "white"}}
-          >
-            Обновить
-          </Button>
+            
+            <FormControl fullWidth variant="filled" sx={{ marginBottom: "16px" }}>
+              {/* <ImageListItem>
+                <img
+                  src={API_URL+thumb}
+                  crossOrigin="anonymous"
+                  loading="lazy"
+                />
+              </ImageListItem> */}
+              <InputLabel htmlFor="thumb" sx={{ fontSize: "20px" }} shrink>
+                Загрузить обложку
+              </InputLabel>
+              <Input
+                type="file"
+                id="thumb"
+                onChange={(e) => {
+                  setThumb(e.target.files[0]);
+                  setChangedFile(true);
+                }}
+                inputProps={{
+                  accept: "image/*",
+                  id: "thumb",
+                }}
+                sx={{ display: "none" }}
+                disabled
+              />
+              <InputAdornment position="end">
+                <IconButton component="label" htmlFor="thumb" color="secondary">
+                  <CloudUploadIcon />
+                  <input
+                    name="thumb"
+                    type="file"
+                    id="thumb"
+                    onChange={(e) => {
+                      setThumb(e.target.files[0]);
+                      setChangedFile(true);
+                    }}
+                    style={{ display: "none" }}
+                    disabled
+                  />
+                </IconButton>
+              </InputAdornment>
+            </FormControl>
+  
+            
+           
+            <FormControl fullWidth variant="filled" sx={{ marginBottom: "16px" }}>
+              {/* <ImageList>
+                {images.isArray &&  images?.map((item, id) => (
+                  <ImageListItem key={id}>
+                    <img
+                      src={API_URL+item}
+                      loading="lazy"
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList> */}
+              <InputLabel htmlFor="images" sx={{ fontSize: "20px" }} shrink>
+                Загрузить изображения
+              </InputLabel>
+              <Input
+                type="file"
+                id="images"
+                onChange={(e) => {
+                  const files = Array.from(e.target.files);
+                  setImages(files);
+                  setChangedImages(true);
+                }}
+                inputProps={{
+                  accept: "image/*",
+                  id: "images",
+                  multiple: true,
+                }}
+                sx={{ display: "none" }}
+                
+              />
+              <InputAdornment position="end">
+                <IconButton component="label" htmlFor="images" color="secondary">
+                  <CloudUploadIcon />
+                  <input
+                    name="images"
+                    type="file"
+                    id="images"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files);
+                      setImages(files);
+                      setChangedImages(true);
+                    }}
+                    inputProps={{
+                      accept: "image/*",
+                      id: "images",
+                      multiple: true,
+                    }}
+                    style={{ display: "none" }}
+                    disabled
+                  />
+                </IconButton>
+              </InputAdornment>
+            </FormControl>
+          </Box>
+          
+          <TableContainer component={Paper}  sx={{ marginTop: "35px", backgroundColor: (theme) => theme.palette.primary.main,}}>
+            <Table className="spoma-table" sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell>#</TableCell>
+                  <TableCell>Размер</TableCell>
+                  <TableCell>Цена</TableCell>
+                  <TableCell>Старая цена</TableCell>
+                  <TableCell>Модель</TableCell>
+                  <TableCell>Действия</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {spomaChain.map((chain, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>
+                      <TextField
+                        type="text"
+                        name="size"
+                        onChange={(e) => handleChangeSpomaChain(index, e)}
+                        value={chain.size}
+                        fullWidth
+                        variant="standard"
+                        required
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        type="number"
+                        name="price"
+                        onChange={(e) => handleChangeSpomaChain(index, e)}
+                        value={chain.price}
+                        fullWidth
+                        variant="standard"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        type="number"
+                        name="old_price"
+                        onChange={(e) => handleChangeSpomaChain(index, e)}
+                        value={chain.old_price}
+                        fullWidth
+                        variant="standard"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {chain.model ? (
+                        chain.active ? (
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href={`${BASE_URL}/modelview/${clientID}/${id}?size=${chain?.size}`}
+                          >
+                            Ссылка
+                          </a>
+                        ) : (
+                          "АРХИВ"
+                        )
+                      ) : (
+                        "Нет модели"
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        color="secondary"
+                        onClick={() =>
+                          chain.model
+                            ? handleArchivateModel(chain.model)
+                            : handleRemoveSpomaChain(index)
+                        }
+                      >
+                        <FontAwesomeIcon icon={faMinus} />
+                      </IconButton>
+                      <IconButton color="secondary" onClick={handleAddSpomaChain}>
+                        <FontAwesomeIcon icon={faPlus} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
           <button
-            onClick={(e) => handleDelete(e)}
-            className="btn btn-cp bg-cp-pomegranate col-3 offset-1"
+            className="w-100 btn btn-sm btn-primary mb-3"
+            onClick={handleAddSpomaChain}
           >
-            Удалить
+            Добавить размер
           </button>
-        </div>
-      </form>
-      <p>
-        <span className="line">
-          <Link to="/panel/products">Отмена</Link>
-        </span>
-      </p>
-      </Box>
-    </div>
-  );
+          <br />
+          <div className="bg-primary container-fluid d-flex flex-column flex-wrap justify-content-center py-2 text-center text-white">
+            <span>
+              Ссылка на примерку:{" "}
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`${BASE_URL}/modelview/${clientID}/${id}`}
+              >{`inroom.tech/modelview/${clientID}/${id}`}</a>
+            </span>
+            <QRCode
+              url={`${BASE_URL}/modelview/${clientID}/${id}`}
+              isImage={false}
+              isButton={true}
+            />
+          </div>
+          <br />
+          <div>
+            <Button
+              onClick={(e) => handleUpdate(e)}
+              disabled={!changed && !changedFile && !changedImages ? true : false}
+              fullWidth
+              variant="contained"
+              size="small"
+              color="secondary"
+              sx={{ marginBottom: "16px" , fontSize: "18px", fontWeight: "500", color: "white"}}
+            >
+              Обновить
+            </Button>
+            <span className="line text-white">
+              <Link to="/panel/products">Отмена</Link>
+            </span>
+            <button
+              onClick={(e) => handleDelete(e)}
+              className="btn btn-cp bg-cp-pomegranate col-3 offset-1"
+            >
+              Удалить
+            </button>
+          </div>
+        </form>
+        </Box>
+      </div>
+    );
+  
 };
 
 export default ReadProduct;

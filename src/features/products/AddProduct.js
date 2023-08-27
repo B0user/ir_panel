@@ -361,14 +361,14 @@ const AddProduct = () => {
                 variant="contained"
                 size="small"
                 color="secondary"
-                sx={{ marginBottom: "16px" , fontSize: "18px", fontWeight: "500", color: "white"}}
+                sx={{ marginBottom: "36px" , fontSize: "14px", fontWeight: "600", color: "white"}}
                 onClick={handleAddSpomaChain}
               >
                 Добавить размер
               </Button>
 
               <Button variant="contained" color="error"
-                size = "large" type = "submit" sx = {{marginBottom: "20px", fontWeight: "400", height: "50px", fontSize: "25px"}}>
+                size = "large" type = "submit" sx = {{marginBottom: "20px", fontWeight: "900", height: "50px", fontSize: "18px"}}>
                 Добавить товар
               </Button>
             </form>

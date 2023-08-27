@@ -44,7 +44,6 @@ const ShowProducts = () => {
     if (isLoading) return <span className="spinner-border" />;
     if (isError) return <p>Что-то пошло не так... {error}</p>;
 
-    console.log(products);
     let simplifiedData = {}
     if(isSuccess){
      simplifiedData = products?.map(item => ({
@@ -55,7 +54,6 @@ const ShowProducts = () => {
           editlink: `${item._id}`
         }));
     }
-    console.log(simplifiedData);
     
 
 
@@ -127,17 +125,10 @@ const ShowProducts = () => {
         ),
       },
     ];
-    if(mockDataTeam) return (
+    if(simplifiedData) return (
 
       <Box m="20px">
-
-
-
-
         <Header title="Список товаров" subtitle="Управление товарами" />
-
-      
-
         <Box
           m="40px 0 0 0"
           height="75vh"
@@ -170,6 +161,7 @@ const ShowProducts = () => {
         
         <TextField
           label="Search"
+          className="mb-3"
           variant="outlined"
           size="small"
           fullWidth
@@ -182,11 +174,12 @@ const ShowProducts = () => {
           }}
           value={searchText}
           onChange={handleSearchTextChange}
-        />  
+        />
       
         
           {/* <DataGrid checkboxSelection rows={simplifiedData} columns={columns} /> */}
           <DataGrid
+          checkboxSelection
           rows={filteredRows}
           columns={columns}
           pageSize={5}
