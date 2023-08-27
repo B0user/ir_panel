@@ -1,51 +1,42 @@
 // Modules
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route } from "react-router-dom";
 // Layouts
-import Layout from './components/Layouts/Layout';
-import PanelLayout from './components/Layouts/PanelLayout';
-import RequireAuth from './components/Layouts/RequireAuth';
-import PersistLogin from './components/Layouts/PersistLogin';
+import Layout from "./components/Layouts/Layout";
+import PanelLayout from "./components/Layouts/PanelLayout";
+import RequireAuth from "./components/Layouts/RequireAuth";
+import PersistLogin from "./components/Layouts/PersistLogin";
 // Login
-import Register from './features/auth/Register';
-import Login from './features/auth/Login';
-import LoginRedir from './features/auth/LoginRedir';
-import Client from './components/profiles/Client';
+import Register from "./features/auth/Register";
+import Login from "./features/auth/Login";
+import LoginRedir from "./features/auth/LoginRedir";
+import Client from "./components/profiles/Client";
 // Products CRUD
-import Products from './features/products/Products';
-import AddProduct from './features/products/AddProduct';
-import ReadProduct from './features/products/ReadProduct';
+import AddProduct from "./features/products/AddProduct";
+import ReadProduct from "./features/products/ReadProduct";
 // Client Chat Support
-import ClientChat from './features/chat/ClientChat';
-import ClientChatMessages from './features/chat/ClientChatMessages';
+import ClientChat from "./features/chat/ClientChat";
+import ClientChatMessages from "./features/chat/ClientChatMessages";
 // Messages
-import Messages from './features/support/Messages';
-import ReadMessage from './features/support/ReadMessage';
+import Messages from "./features/support/Messages";
+import ReadMessage from "./features/support/ReadMessage";
 
-import Missing from './components/Missing';
-import Unauthorized from './components/Unauthorized';
+import Missing from "./components/Missing";
+import Unauthorized from "./components/Unauthorized";
+import ShowProducts from "./features/products/ShowProducts";
+import Dashboard from "./scenes/dashboard/index";
+
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { ColorModeContext, useMode } from "./theme";
+
 
 function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Login />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
-        <Route element={<PersistLogin />}>
-          <Route path="/redir" element={<LoginRedir />} />
+  const [theme, colorMode] = useMode();
 
-<<<<<<< Updated upstream
-          {/* Client Routing */} 
-          <Route element={<RequireAuth allowedRoles={[1101]} />}>
-            <Route path="panel" element={<PanelLayout role={1101}/>}>
-              <Route index element={<Client />}/>
-              <Route path="products">
-                <Route index element={<Products published={true}/>}/>
-                <Route path="archieve" element={<Products published={false}/>}/>
-                <Route path="add" element={<AddProduct />}/>
-                <Route path=":id" element={<ReadProduct />}/>
-=======
+  return (
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Login />} />
@@ -62,7 +53,11 @@ function App() {
                   <Route index element={<Client />} />
 
                   <Route path="products">
-                    <Route index element={<ShowProducts/>} />
+                    {/* <Route index element={<Products published={true}/>}/> */}
+                    {/*<Route path="archieve" element={<Products published={false}/>}/>
+                    <Route path="add" element={<AddProduct />}/>
+                    <Route path=":id" element={<ReadProduct />}/> */}
+                    <Route index element={<ShowProducts />} />
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="add" element={<AddProduct />} />
                     <Route path=":id" element={<ReadProduct />} />
@@ -74,28 +69,32 @@ function App() {
                   </Route>
                 </Route>
                 
->>>>>>> Stashed changes
               </Route>
-              <Route path="support">
-                <Route index element={<ClientChat />}/>
-                <Route path=":id" element={<ClientChatMessages />}/>
-              </Route>
-            </Route>
-          </Route>
 
-          {/* Support Routing */} 
-          <Route element={<RequireAuth allowedRoles={[2837]} />}>
-            <Route path="support" element={<PanelLayout role={2837}/>}>
-              <Route index element={<Messages isClosed={false} isPublic={false}/>}/>
-              <Route path="publicreports" element={<Messages isClosed={false} isPublic={true}/>}/>
-              <Route path="completed" element={<Messages isClosed={true} isPublic={true}/>}/>
-              <Route path=":id" element={<ReadMessage />}/>
+              {/* Support Routing */}
+              <Route element={<RequireAuth allowedRoles={[2837]} />}>
+                <Route path="support" element={<PanelLayout role={2837} />}>
+                  <Route
+                    index
+                    element={<Messages isClosed={false} isPublic={false} />}
+                  />
+                  <Route
+                    path="publicreports"
+                    element={<Messages isClosed={false} isPublic={true} />}
+                  />
+                  <Route
+                    path="completed"
+                    element={<Messages isClosed={true} isPublic={true} />}
+                  />
+                  <Route path=":id" element={<ReadMessage />} />
+                </Route>
+              </Route>
             </Route>
+            <Route path="*" element={<Missing />} />
           </Route>
-        </Route>
-        <Route path="*" element={<Missing />} />
-      </Route>
-    </Routes>
+        </Routes>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

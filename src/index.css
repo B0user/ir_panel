@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap");
 
 * {
     margin: 0;
@@ -7,14 +7,19 @@
 }
 
 html {
-    font-family: 'Nunito', sans-serif;
-    font-size: 22px;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 18px;
     color: #fff;
 }
 
 body {
     height: 100%;
     background-color: #ecf0f1;
+}
+.content {
+    height: 100%;
+    width: 100%;
+    font-family: "Source Sans Pro", sans-serif;
 }
 
 .App {

@@ -60,11 +60,11 @@ const Login = () => {
 
     return (
 
-        <section>
+        <section style={{marginTop: "300px"}}>
             <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
             <h1>Войти</h1>
             <form onSubmit={handleSubmit}>
-                <label htmlFor="username" className="form-label">Username:</label>
+                <label htmlFor="username" className="form-label">Логин:</label>
                 <input
                     type="text"
                     id="username"

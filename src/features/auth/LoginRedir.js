@@ -10,7 +10,6 @@ const LoginRedir = () => {
         : undefined;
     
     const roles = decoded?.UserInfo?.roles || [];
-    console.log(roles);
     return (
         roles 
             ? roles.includes(1101) 
